@@ -1,0 +1,7 @@
+<config name="test">
+  <node name="a" type="int" value="1"/>
+  <node name="b">
+    <node name="c" type="int" value="2"/>
+    <node name="d" type="int" value="3"/>
+  </node>
+</config>
