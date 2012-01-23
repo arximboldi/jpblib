@@ -3,7 +3,7 @@
 #  File:       collab.py
 #  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
 #  Date:       Fri Jan 20 15:49:30 2012
-#  Time-stamp: <2012-01-20 17:35:57 jbo>
+#  Time-stamp: <2012-01-23 19:42:08 jbo>
 #
 
 #
@@ -27,14 +27,14 @@
 
 
 """
-Collaborative methods helper library.
+Cooperative methods helper library.
 """
 
 import inspect
 from functools import wraps
 
-class CollaborativeError(Exception): pass
-class ConstructorError(CollaborativeError):  pass
+class CooperativeError(Exception): pass
+class ConstructorError(CooperativeError):  pass
 
 def check_is_constructor(method):
     if method.__name__ != '__init__':
@@ -84,14 +84,21 @@ def constructor(cls):
         return wrapper
     return decorator
 
-def has_constructor(cls):
-    wrapped_constructor = constructor(cls)(cls.__dict__['__init__'])
-    wrapped_constructor.__objclass__ = cls
-    cls.__init__ = wrapped_constructor
+def defines_method(cls, method_name):
+    deriv_method = getattr(getattr(cls, method_name, None), 'im_func', None)
+    super_method = getattr(getattr(super(cls, cls), method_name, None), 'im_func', None)
+    return id(super_method) != id(deriv_method)
+
+
+def cooperative(cls):
+    if defines_method(cls, '__init__'):
+        wrapped_constructor = constructor(cls)(cls.__dict__['__init__'])
+        wrapped_constructor.__objclass__ = cls
+        cls.__init__ = wrapped_constructor
     return cls
 
-def collaborate():
-    pass
 
-def collaborative():
-    pass
+class CooperativeMeta(type):
+    def __init__(cls, name, bases, dct):
+        super(CooperativeMeta, cls).__init__(name, bases, dct)
+        cooperative(cls)
